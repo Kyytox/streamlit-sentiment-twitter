@@ -47,7 +47,8 @@ from frequentsWords import get_frequent_words
 sentiments = ['Positive','Neutral','Negative']
 
 # color in graphs
-colors = ["rgb(0,114,27)", "rgb(195,195,0)", "rgb(145,0,13)"]
+# colors = ["rgb(0,114,27)", "rgb(195,195,0)", "rgb(145,0,13)"]
+colors = ["rgb(145,0,13)", "rgb(195,195,0)", "rgb(0,114,27)"]
 
 
 def load_data(page):
@@ -77,18 +78,16 @@ def extract_name_user(list_csv):
     return list_user
 
 
-
-
 # retriev csv file of folder ./data_csv
 def get_csv_file():
     path = "./data_csv"
     return extract_name_user(os.listdir(path))
 
 
-
+st.cache()
 def main():
     # define width of page web 
-    # st.set_page_config(layout="wide")
+    st.set_page_config(layout="wide")
     # CSS
     st.markdown(
         """
@@ -115,17 +114,15 @@ def main():
         unsafe_allow_html=True,
     )
 
-    pages = get_csv_file()
+    files = get_csv_file()
+    selected_user = st.sidebar.selectbox("Choose user", files, key='user_selector')
 
-    # browse pages and display button for each page 
-    # when click on button, display data of page
-    page = "App"
-    for user in pages:
-        if st.sidebar.button(user):
-            page = user
+    print("selected_user", selected_user)
 
-    if page != "App":
-        df = load_data(page)
+    if selected_user != "App":
+        df = load_data(selected_user)
+        #Title
+        st.title(f"Sentiment Twitter {selected_user}")
         display_graphs(df)
     else:
         st.title("Page d'accueil")
@@ -136,8 +133,6 @@ def main():
 
 
 def display_graphs(df):   
-    #Title
-    st.title(f"Sentiment Twitter{page}")
 
     # Graph 1 - 2
     col1, col2 = st.columns([7,10])
@@ -175,16 +170,15 @@ def display_graphs(df):
             _get_pie_charts_interactions(df_data_interac)
 
 
-
     # 
     # Frequents words
-    with st.spinner("Loading word cloud ..."):
-        list_frequent_words = get_frequent_words(df)
-        text_wordCloud = ' '.join([f"{d['text']} " * d['value'] for d in list_frequent_words])
-        wordcloud = WordCloud(width=600, height=400, max_font_size=90, collocations=False, colormap="Reds").generate(text_wordCloud)
+    # with st.spinner("Loading word cloud ..."):
+    list_frequent_words = get_frequent_words(df)
+    text_wordCloud = ' '.join([f"{d['text']} " * d['value'] for d in list_frequent_words])
+    wordcloud = WordCloud(width=600, height=400, max_font_size=90, collocations=False, colormap="Reds").generate(text_wordCloud)
 
-        with st.container():
-            _get_wordcloud(wordcloud)
+    with st.container():
+        _get_wordcloud(wordcloud)
 
 
 
@@ -210,8 +204,14 @@ def _get_bar_charts_by_sent(df):
 
 
 
+
 # Bar Charts Day
 # Number of tweets by day
+
+# @st.cache
+# def get_selected_year(this_year):
+#     return st.selectbox('', range(this_year, this_year - 4, -1), index=1, key=1)
+
 def _get_bar_charts_day(df):
     # group dataframe by month and sentiment and count the nb of tweets  
     # create a new data frame with 3 columns [date_tweet sentiment count]
@@ -222,8 +222,8 @@ def _get_bar_charts_day(df):
     # create calendar with month  
     this_year = datetime.date.today().year
 
-    # report_year = st.selectbox('', range(this_year, this_year - 2, -2)+ ['2023'],default='2022', key=1)
     report_year = st.selectbox('', range(this_year, this_year - 4, -1), index=1, key=1)
+    # report_year = get_selected_year(this_year)
 
     data = df_data_bar_month[df_data_bar_month['date_tweet'].dt.strftime("%Y").str.startswith(f'{report_year}')]
 
@@ -250,6 +250,7 @@ def _get_bar_charts_month(df):
     report_month_str = st.radio('', month_name_lst, index=this_month - 2, horizontal=True, key=4)
     report_month = list(calendar.month_name).index(report_month_str)
 
+    # filter dataframe by year and month
     df_data_bar_month = df_data_bar_month[df_data_bar_month['date_tweet'].dt.strftime("%Y-%m").str.startswith(f'{report_year}-{"{:02d}".format(report_month)}')]
 
     fig4 = px.bar(df_data_bar_month, x='date_tweet', y='nb_tweets', color='sentiment', color_discrete_sequence=colors, labels={'nb_tweets':'Nombre tweetswwwwww '},text_auto=True)
@@ -265,7 +266,7 @@ def _get_bar_charts_interactions(df):
 
 
 def _get_pie_charts_interactions(df):
-    fig6 = px.sunburst(df, path=["sentiment","interactions"], values='count', color='sentiment', color_discrete_sequence=["rgb(0,114,27)", "rgb(145,0,13)", "rgb(195,195,0)"])
+    fig6 = px.sunburst(df, path=["sentiment","interactions"], values='count', color='sentiment', color_discrete_sequence=["rgb(145,0,13)","rgb(195,195,0)", "rgb(0,114,27)"])
     fig6.update_traces(hovertemplate='%{label}<br>%{value}') # data when hover graph 
     st.plotly_chart(fig6,use_container_width=True)
 
@@ -281,4 +282,5 @@ def _get_wordcloud(wordcloud):
     st.pyplot(fig)
 
 
-main()
+if __name__ == '__main__':
+    main()

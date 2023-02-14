@@ -2,7 +2,8 @@
 import streamlit as st
 import pandas as pd
 
-sentiments = ['Positive','Neutral','Negative']
+# sentiments = ['Positive','Neutral','Negative']
+sentiments = ['Negative','Neutral','Positive']
 
 # number of tweets by sentiments
 def get_nb_tweets_sent(df):
