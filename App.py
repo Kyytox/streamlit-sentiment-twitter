@@ -31,6 +31,7 @@ import streamlit as st
 import pandas as pd
 
 from displayGraphs import display_graphs
+from Accueil import page_accueil
 
 
 # retriev csv file of folder ./data_csv
@@ -86,6 +87,7 @@ def main():
         display_graphs(df)
     else:
         st.title("Page d'accueil")
+        page_accueil(df)
 
 
 
