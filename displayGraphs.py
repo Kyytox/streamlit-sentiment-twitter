@@ -24,23 +24,29 @@ from graphsFrequentWords import _get_wordcloud
 
 def display_graphs(df):   
 
-    tab1, tab2, tab3 = st.tabs(["Sentiments", "Interactions", "Frequent Words"])
-
-    # #
-    # # Sentiments
-    with tab1:
-        tabs_sentiments(df)
-            
-    # #
-    # # Interactions
-    with tab2:
-        tabs_interactions(df)
+    current_tab = st.sidebar.radio("Sélectionnez une section :", ["Sentiments", "Interactions", "Frequent Words"])
     
-    # # 
-    # # Frequents words
-    with tab3:
-        tabs_frequent_words(df)
+    if current_tab == "Sentiments":
+        # charger les données uniquement si on est sur l'onglet
+        load_data(df, "Sentiments")
+    elif current_tab == "Interactions":
+        # charger les données uniquement si on est sur l'onglet
+        load_data(df, "Interactions")
+    elif current_tab == "Frequent Words":
+        # charger les données uniquement si on est sur l'onglet
+        load_data(df, "Frequent Words")
 
+
+
+st.cache
+def load_data(df, tab):
+    if tab == "Sentiments":
+        tabs_sentiments(df)
+    elif tab == "Interactions":
+        tabs_interactions(df)
+    elif tab == "Frequent Words":
+        tabs_frequent_words(df)
+    
 
 
 ##################################################
