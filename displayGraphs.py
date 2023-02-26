@@ -31,7 +31,7 @@ def display_graphs(df):
     with col1:
         # Pie charts 
         # distribution of the number of tweets by sentiments
-        _get_pie_charts_by_sent(df)
+        col1.plotly_chart(_get_pie_charts_by_sent(df),use_container_width=True)
     with col2:
         # Bar charts 
         # number of tweets by Sentiments 
@@ -79,9 +79,16 @@ def display_graphs(df):
 # distribution of the number of tweets by sentiments
 def _get_pie_charts_by_sent(df):
     data_pie = get_nb_tweets_sent(df)
-    fig = go.Figure(data=[go.Pie(labels=data_pie['sentiment'], values=data_pie['nb_tweets'], pull=[0.015, 0.015, 0.015], marker_colors=colors)])
-    st.subheader('Pie data')
-    st.plotly_chart(fig,use_container_width=True)
+    return go.Figure(
+        data=[
+            go.Pie(
+                labels=data_pie['sentiment'],
+                values=data_pie['nb_tweets'],
+                pull=[0.015, 0.015, 0.015],
+                marker_colors=colors,
+            )
+        ]
+    )
 
 
 # Bar charts 
@@ -120,7 +127,7 @@ def _get_bar_charts_day(df):
     data = df_data_bar_month[df_data_bar_month['date_tweet'].dt.strftime("%Y").str.startswith(f'{report_year}')]
 
     fig3 = px.bar(data, x='date_tweet', y='nb_tweets', color='sentiment', color_discrete_sequence=colors, labels={'nb_tweets':'Nombre tweets'},text_auto='.2s')
-    fig3.update_traces(textfont_size=16, textangle=0, textposition="outside", cliponaxis=False)
+ # type: ignore    fig3.update_traces(textfont_size=16, textangle=0, textposition="outside", cliponaxis=False)
     st.plotly_chart(fig3,use_container_width=True)
 
 

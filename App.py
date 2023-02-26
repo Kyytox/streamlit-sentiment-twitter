@@ -69,6 +69,11 @@ def main():
         .css-z09lfk {
             width: 77%;
         }
+        
+        # CSS for the sidebar
+        [data-testid="stSidebar"][aria-expanded="true"] {
+            width: 100px;
+        }
         </style>
         
         """,
