@@ -1,6 +1,4 @@
-import time
 import streamlit as st
-import numpy as np
 
 
 import plotly.graph_objects as go
@@ -25,7 +23,6 @@ def page_accueil(df):
     with st.container():
         #  call the function to display the pie charts
         display_pie_charts(df)
-
 
 
 
