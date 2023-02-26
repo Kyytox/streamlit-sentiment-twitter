@@ -16,9 +16,26 @@ colors = ["rgb(145,0,13)", "rgb(195,195,0)", "rgb(0,114,27)"]
 # Pie charts 
 # distribution of the number of tweets by sentiments
 def page_accueil(df):
-    # for each user in the dataframe create a pie chart 
-    # the pie chart is the distribution of the number of tweets by sentiments
 
+    with st.container():
+        # display bar charts of number of tweets by user
+        fig = _get_bar_chart_nb_tweets_by_user(df)
+        st.plotly_chart(fig, use_container_width=True)
+    # create container
+    with st.container():
+        #  call the function to display the pie charts
+        display_pie_charts(df)
+
+
+
+
+
+
+
+# Pie charts
+# for each user in the dataframe create a pie chart 
+# the pie chart is the distribution of the number of tweets by sentiments
+def display_pie_charts(df):
     # Create a list to store all the figure placeholders
     list_fig = []
 
@@ -64,3 +81,37 @@ def page_accueil(df):
             fig_index = i + j
             if fig_index < n_charts:
                 col.plotly_chart(list_fig[fig_index], use_container_width=True)
+
+
+
+
+
+# bar charts of number of tweets by user
+def _get_bar_chart_nb_tweets_by_user(df):
+    # get the number of tweets by user
+    df_nb_tweets = df.groupby('name_user').size().reset_index(name='nb_tweets')
+
+    # sort the dataframe by number of tweets
+    df_nb_tweets = df_nb_tweets.sort_values(by=['nb_tweets'], ascending=False)
+
+    # create the bar chart
+    fig = go.Figure(data=[go.Bar(
+        x=df_nb_tweets['name_user'],
+        y=df_nb_tweets['nb_tweets'],
+        marker_color=colors[0],
+        opacity=0.8
+    )])
+
+    # update the layout
+    fig.update_layout(
+        title=dict(
+            text="Nombre de tweets par utilisateur",
+        ),
+        xaxis_title="Compte Twitter",
+        yaxis_title="Nombre de tweets",
+        showlegend=False,
+        margin=dict(l=0, r=0, t=40, b=0),
+        height=400
+    )
+
+    return fig

@@ -40,7 +40,7 @@ def get_csv_file():
     df = pd.read_csv(file_name)
     df['date_tweet'] = pd.to_datetime(df['date_tweet'], errors='coerce')
     lst_name_user = list(df['name_user'].unique())
-    lst_name_user.insert(0, "Accueil")
+    # lst_name_user.insert(0, "Accueil")
     return [lst_name_user, df]
 
 
@@ -69,7 +69,7 @@ def main():
         .css-z09lfk {
             width: 77%;
         }
-        
+
         # CSS for the sidebar
         [data-testid="stSidebar"][aria-expanded="true"] {
             width: 100px;
@@ -91,7 +91,7 @@ def main():
         st.title(f"Sentiment Twitter {selected_user}")
         display_graphs(df)
     else:
-        st.title("Page d'accueil")
+        st.title("Analyse des sentiments sur Twitter")
         page_accueil(df)
 
 

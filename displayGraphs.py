@@ -26,6 +26,12 @@ colors = ["rgb(145,0,13)", "rgb(195,195,0)", "rgb(0,114,27)"]
 
 def display_graphs(df):   
 
+
+    #  display the graph line of the score by day
+    st.subheader('Moyenne des scores par jour et par sentiment')
+    st.plotly_chart(_get_line_chart_score(df),use_container_width=True)
+
+
     # Graph 1 - 2
     col1, col2 = st.columns([7,10])
     with col1:
@@ -38,39 +44,39 @@ def display_graphs(df):
         _get_bar_charts_by_sent(df)
 
 
-    # Graph 3 - 4
-    col3, col4 = st.columns([7,10])
-    with col3:
-        # Bar Charts Month 
-        # Number of tweets by month
-        _get_bar_charts_day(df)
-    with col4:
-        # Bar Charts Day
-        # Number of tweets by day
-        _get_bar_charts_month(df)
+    # # Graph 3 - 4
+    # col3, col4 = st.columns([7,10])
+    # with col3:
+    #     # Bar Charts Month 
+    #     # Number of tweets by month
+    #     _get_bar_charts_day(df)
+    # with col4:
+    #     # Bar Charts Day
+    #     # Number of tweets by day
+    #     _get_bar_charts_month(df)
 
 
-    # 
-    # Interactions
-    with st.container():
-        df_data_interac = get_data_interactions(df)
-        col5, col6 = st.columns(2)
-        with col5:
-            _get_bar_charts_interactions(df_data_interac)
+    # # 
+    # # Interactions
+    # with st.container():
+    #     df_data_interac = get_data_interactions(df)
+    #     col5, col6 = st.columns(2)
+    #     with col5:
+    #         _get_bar_charts_interactions(df_data_interac)
 
-        with col6:
-            _get_pie_charts_interactions(df_data_interac)
+    #     with col6:
+    #         _get_pie_charts_interactions(df_data_interac)
 
 
-    # 
-    # Frequents words
-    # with st.spinner("Loading word cloud ..."):
-    list_frequent_words = get_frequent_words(df)
-    text_wordCloud = ' '.join([f"{d['text']} " * d['value'] for d in list_frequent_words])
-    wordcloud = WordCloud(width=600, height=400, max_font_size=90, collocations=False, colormap="Reds").generate(text_wordCloud)
+    # # 
+    # # Frequents words
+    # # with st.spinner("Loading word cloud ..."):
+    # list_frequent_words = get_frequent_words(df)
+    # text_wordCloud = ' '.join([f"{d['text']} " * d['value'] for d in list_frequent_words])
+    # wordcloud = WordCloud(width=600, height=400, max_font_size=90, collocations=False, colormap="Reds").generate(text_wordCloud)
 
-    with st.container():
-        _get_wordcloud(wordcloud)
+    # with st.container():
+    #     _get_wordcloud(wordcloud)
 
 
 
@@ -102,14 +108,41 @@ def _get_bar_charts_by_sent(df):
 
 
 
+# Score line chart
+# score by day
+def _get_line_chart_score(df):
+    # group dataframe by day and sentiment and calculate the mean of score 
+    # create a new data frame with 3 columns [date_tweet sentiment score]
+    df_data_line = df.groupby([pd.Grouper(key='date_tweet',freq='D'), 'sentiment']).agg({'score': 'mean'}).rename(columns={'score':'score'}).reset_index()
+
+    fig = px.line(df_data_line, 
+                x='date_tweet', 
+                y='score', 
+                color='sentiment', 
+                color_discrete_sequence=colors, 
+                labels={'score':'Score moyen'},
+                width=800,
+                height=600)
+    fig.update_traces(mode='lines+markers')
+    return fig
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
 
 
 # Bar Charts Day
 # Number of tweets by day
-
-# @st.cache
-# def get_selected_year(this_year):
-#     return st.selectbox('', range(this_year, this_year - 4, -1), index=1, key=1)
 
 def _get_bar_charts_day(df):
     # group dataframe by month and sentiment and count the nb of tweets  
