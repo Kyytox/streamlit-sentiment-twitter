@@ -35,6 +35,7 @@ from Accueil import page_accueil
 
 
 # retriev csv file of folder ./data_csv
+st.cache()
 def get_csv_file():
     file_name = "./data_csv/data-tweets.csv"
     df = pd.read_csv(file_name)

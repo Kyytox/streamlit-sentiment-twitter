@@ -28,7 +28,7 @@ def display_graphs(df):
 
 
     #  display the graph line of the score by day
-    st.subheader('Moyenne des scores par jour et par sentiment')
+    st.subheader('Moyenne des scores par sentiment')
     st.plotly_chart(_get_line_chart_score(df),use_container_width=True)
 
 
@@ -109,11 +109,26 @@ def _get_bar_charts_by_sent(df):
 
 
 # Score line chart
-# score by day
+# Mean of score by day and by sentiment
 def _get_line_chart_score(df):
+
+    lst_options = ['par jour', 'tout les 3 jours', 'par semaine', 'par mois']    
+    freq_option = st.radio('Fréquence de temps :', lst_options, index=0, horizontal=True, key=1)
+
+    # use match case to select the frequency of the graph
+    match freq_option:
+        case 'par jour':
+            freq_option = 'D'
+        case 'tout les 3 jours':
+            freq_option = '3D'
+        case 'par semaine':
+            freq_option = 'W'
+        case 'par mois':
+            freq_option = 'M'
+
     # group dataframe by day and sentiment and calculate the mean of score 
     # create a new data frame with 3 columns [date_tweet sentiment score]
-    df_data_line = df.groupby([pd.Grouper(key='date_tweet',freq='D'), 'sentiment']).agg({'score': 'mean'}).rename(columns={'score':'score'}).reset_index()
+    df_data_line = df.groupby([pd.Grouper(key='date_tweet',freq=freq_option), 'sentiment']).agg({'score': 'mean'}).reset_index()
 
     fig = px.line(df_data_line, 
                 x='date_tweet', 
