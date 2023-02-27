@@ -13,6 +13,9 @@ from graphsSentiments import _get_line_chart_score
 from graphsSentiments import _get_pie_charts_by_sent
 from graphsSentiments import _get_bar_charts_by_sent
 from graphsSentiments import _get_bar_charts_day
+from graphsSentiments import _get_box_charts_score
+from graphsSentiments import _get_heatmap_score
+from graphsSentiments import _get_heatmap_nb_tweets
 
 from graphsInteractions import _get_line_chart_interactions
 from graphsInteractions import _get_bar_charts_interactions
@@ -53,33 +56,50 @@ def load_data(df, tab):
 # Tabs Sentiments 
 
 def tabs_sentiments(df):
+
+    col1, col2 = st.columns([7,10])
+    with col1:
+        # display the graph box of the score
+        st.subheader('Boîte à moustache des scores par sentiment')
+        st.plotly_chart(_get_box_charts_score(df))
+
+        # display the graph heatmap of the number of tweets
+        st.subheader('Heatmap du nombre de tweets par sentiment')
+        st.plotly_chart(_get_heatmap_nb_tweets(df))
+
+    with col2:
+        # display the graoh heatmap of the score
+        st.subheader('Heatmap des scores par sentiment')
+        st.plotly_chart(_get_heatmap_score(df))
+
+
+
     #  display the graph line of the score
     st.subheader('Moyenne des scores par sentiment')
     st.plotly_chart(_get_line_chart_score(df),use_container_width=True)
 
+    # # Graph 1 - 2
+    # col1, col2 = st.columns([7,10])
+    # with col1:
+    #     # Pie charts 
+    #     # distribution of the number of tweets by sentiments
+    #     col1.plotly_chart(_get_pie_charts_by_sent(df),use_container_width=True)
+    # with col2:
+    #     # Bar charts 
+    #     # number of tweets by Sentiments 
+    #     _get_bar_charts_by_sent(df)
 
-    # Graph 1 - 2
-    col1, col2 = st.columns([7,10])
-    with col1:
-        # Pie charts 
-        # distribution of the number of tweets by sentiments
-        col1.plotly_chart(_get_pie_charts_by_sent(df),use_container_width=True)
-    with col2:
-        # Bar charts 
-        # number of tweets by Sentiments 
-        _get_bar_charts_by_sent(df)
 
-
-    # Graph 3 - 4
-    col3, col4 = st.columns([7,10])
-    with col3:
-        # Bar Charts Month 
-        # Number of tweets by month
-        _get_bar_charts_day(df)
-    with col4:
-        # Bar Charts Day
-        # Number of tweets by day
-        _get_bar_charts_month(df)
+    # # Graph 3 - 4
+    # col3, col4 = st.columns([7,10])
+    # with col3:
+    #     # Bar Charts Month 
+    #     # Number of tweets by month
+    #     _get_bar_charts_day(df)
+    # with col4:
+    #     # Bar Charts Day
+    #     # Number of tweets by day
+    #     _get_bar_charts_month(df)
 
 
 

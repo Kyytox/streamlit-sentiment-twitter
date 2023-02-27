@@ -121,3 +121,104 @@ def _get_bar_charts_month(df):
     fig4 = px.bar(df_data_bar_month, x='date_tweet', y='nb_tweets', color='sentiment', color_discrete_sequence=colors, labels={'nb_tweets':'Nombre tweetswwwwww '},text_auto=True)
     fig4.update_traces(textfont_size=14, textangle=0, cliponaxis=False)
     st.plotly_chart(fig4,use_container_width=True)
+
+
+
+# box charts of score by sentiment
+def _get_box_charts_score(df):
+    # regroup df by sentiment 
+    df_data_box = df.groupby(['sentiment']).agg({'score': ['mean', 'median', 'min', 'max', lambda x: x.quantile(0.25), lambda x: x.quantile(0.75)]}).reset_index()
+    fig = go.Figure()
+
+    # add trace for each sentiment
+    for count_color, sentiment in enumerate(df_data_box['sentiment'].unique()):
+        # extract all score for the sentiment and place them in a list
+        data = df_data_box[df_data_box['sentiment'] == sentiment]['score'].values
+        data = str(data)
+
+        # Supprimer les crochets [ ] et diviser les valeurs en une liste
+        list_data = data.strip('[]').split()
+
+        # Convertir les éléments de la liste en flottants
+        list_data = [float(x) for x in list_data]
+
+        print(list_data)
+
+        # add trace for the sentiment
+        fig.add_trace(go.Box(y=list_data,
+                            name=sentiment, 
+                            boxpoints='all', 
+                            jitter=0,
+                            marker_color=colors[count_color],
+                            marker_size=3, 
+                            line_width=1, 
+                            width=0.4))
+    fig.update_layout(
+        title='Box plot of score by sentiment',
+        xaxis_title='Sentiment',
+        yaxis_title='Score',
+        width=500,
+        height=600,
+        boxmode='group'
+    )
+
+    return fig
+
+
+
+# heatmap of mean score by day and by sentiment
+def _get_heatmap_score(df):
+
+    freq_option = _get_freq_option(3)
+
+    # group dataframe by day and sentiment and calculate the mean of score 
+    # create a new data frame with 3 columns [date_tweet sentiment score]
+    df_data_heatmap = df.groupby([pd.Grouper(key='date_tweet',freq=freq_option), 'sentiment']).agg({'score': 'mean'}).reset_index()
+
+    # create a pivot table with index = date_tweet, columns = sentiment and values = score
+    df_data_heatmap = df_data_heatmap.pivot(index='date_tweet', columns='sentiment', values='score')
+
+    # create a heatmap
+    fig = go.Figure(data=go.Heatmap(
+                z=df_data_heatmap.values,
+                x=df_data_heatmap.columns,
+                y=df_data_heatmap.index,
+                colorscale='plasma'))
+    fig.update_layout(
+        title='Heatmap of mean score by day and by sentiment',
+        xaxis_title='Sentiment',
+        yaxis_title='Date',
+        width=700,
+        height=1000,
+        autosize=True,
+    )
+    return fig
+
+
+#  heat map of number of tweets by hour and by sentiment
+def _get_heatmap_nb_tweets(df):
+    df['jour_semaine'] = pd.to_datetime(df['date_tweet']).dt.day_name()
+    df['heure'] = df['date_tweet'].dt.hour
+
+    # Create a dataframe regroup by day and hour and sentiment and calculate the number of tweets
+    df_heatmap = df.groupby(['jour_semaine', 'heure', 'sentiment']).agg({'sentiment': 'size'}).rename(columns={'sentiment':'count'}).reset_index()
+
+    fig = go.Figure(data=go.Heatmap(
+                    z=df_heatmap['count'],
+                    x=df_heatmap['heure'], 
+                    y=df_heatmap['sentiment'],
+                    colorscale='plasma',
+                    hoverongaps = False))
+    
+
+    fig.update_traces(hovertemplate='Heure: %{x}<br>Nombre de tweets: %{z}')
+
+    fig.update_layout(
+        title='Heatmap of mean score by day and by sentiment',
+        xaxis_title='Heure',
+        yaxis_title='Sentiment',
+        width=550,
+        height=500,
+        autosize=True,
+    )
+    return fig
