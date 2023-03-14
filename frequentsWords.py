@@ -10,8 +10,14 @@ import nltk
 # DL frequent words FR
 # spacy.cli.download("fr_core_news_sm")
 # nltk.download('stopwords')
-nlp = spacy.load("fr_core_news_sm")
+
+# load model for french language
+nlp = spacy.load("./nltk/fr_core_news_sm/fr_core_news_sm-3.5.0")
+
+# change the path of stopwords and set stopWords for french
+nltk.data.path.append("./nltk")
 stopWords = set(stopwords.words('french'))
+
 
 # Tokenise sentence
 def token_text(sentence):

@@ -6,6 +6,8 @@ from displayGraphs import display_graphs
 from Accueil import page_accueil
 
 
+st.set_page_config(layout="wide")
+
 # retriev csv file of folder ./data_csv
 # st.cache()
 def get_csv_file():
@@ -13,15 +15,12 @@ def get_csv_file():
     df = pd.read_csv(file_name)
     df['date_tweet'] = pd.to_datetime(df['date_tweet'], errors='coerce')
     lst_name_user = list(df['name_user'].unique())
-    # lst_name_user.insert(0, "Accueil")
     return [lst_name_user, df]
 
 
 
 st.cache()
 def main():
-    # define width of page web 
-    st.set_page_config(layout="wide")
     # CSS
     st.markdown(
         """
@@ -54,13 +53,12 @@ def main():
     )
 
     lst_name_user, df = get_csv_file()
-    selected_user = st.sidebar.selectbox("Choississez un des compte twitter qui a été analysé", lst_name_user, key='user_selector')
+    selected_user = st.sidebar.selectbox("Choisissez un des compte twitter qui a été analysé", lst_name_user, key='user_selector')
 
     print("selected_user", selected_user)
 
     if selected_user != "Accueil":
         df = df[df['name_user'] == selected_user]
-        #Title
         st.title(f"Sentiment Twitter {selected_user}")
         display_graphs(df)
     else:
